@@ -18,5 +18,5 @@ export interface ApiRequest {
 export interface ApiResponse {
   status: number;
   headers: Record<string, string>;
-  body?: any;
+  body?: any; // Can be a stream, text, or json for true proxying
 }

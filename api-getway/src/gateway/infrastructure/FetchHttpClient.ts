@@ -8,13 +8,15 @@ export class FetchHttpClient implements HttpClientPort {
     const headers = { ...request.headers };
     delete headers.host; // Remove host to avoid conflicts
     
-    const fetchOptions: RequestInit = {
+    // In Node.js 18+ fetch, passing a ReadableStream as body requires 'duplex: half'
+    const fetchOptions: RequestInit & { duplex?: 'half' } = {
       method: request.method,
       headers: headers as HeadersInit,
     };
     
     if (request.body && ['POST', 'PUT', 'PATCH'].includes(request.method)) {
-      fetchOptions.body = JSON.stringify(request.body);
+      fetchOptions.body = request.body;
+      fetchOptions.duplex = 'half';
     }
 
     const response = await fetch(targetUrl, fetchOptions);
@@ -23,19 +25,11 @@ export class FetchHttpClient implements HttpClientPort {
     response.headers.forEach((value, key) => {
       responseHeaders[key] = value;
     });
-    
-    let body;
-    const contentType = response.headers.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-      try { body = await response.json(); } catch { body = null; }
-    } else {
-      body = await response.text();
-    }
 
     return {
       status: response.status,
       headers: responseHeaders,
-      body,
+      body: response.body, // Pass as readable stream directly
     };
   }
 }

@@ -26,11 +26,8 @@ async function handleRequest(request: NextRequest): Promise<NextResponse> {
   
   let body;
   if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
-    try {
-      body = await request.json();
-    } catch {
-      // Ignore if not json
-    }
+    // Forward the readable stream directly to avoid buffering overhead
+    body = request.body;
   }
 
   const apiRequest: ApiRequest = {
@@ -43,8 +40,15 @@ async function handleRequest(request: NextRequest): Promise<NextResponse> {
 
   const response = await gateway.handleRequest(apiRequest);
   
-  return NextResponse.json(response.body, {
+  // Support returning Next.js errors or streamed responses from API directly
+  if (response.status >= 400 && response.status < 500 && !response.body) {
+    return NextResponse.json(response.body, { status: response.status });
+  }
+
+  // Stream standard fetch responses dynamically avoiding buffer
+  return new NextResponse(response.body as any, {
     status: response.status,
+    headers: response.headers,
   });
 }
 
