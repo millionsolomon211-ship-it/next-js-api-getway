@@ -5,19 +5,19 @@ export class StaticRouteRegistry implements RouteRegistryPort {
   private routes: RouteConfig[] = [
     {
       pathPrefix: '/api/auth',
-      targetServiceUrl: 'http://localhost:8081', // Example Auth Microservice
+      targetServiceUrl: process.env.AUTH_SERVICE_URL || 'http://localhost:8081',
       requiresAuth: false,
       rateLimitType: 'strict',
     },
     {
       pathPrefix: '/api/orders',
-      targetServiceUrl: 'http://localhost:8082', // Example Orders Microservice
+      targetServiceUrl: process.env.ORDERS_SERVICE_URL || 'http://localhost:8082',
       requiresAuth: true,
       rateLimitType: 'standard',
     },
     {
       pathPrefix: '/api/catalog',
-      targetServiceUrl: 'http://localhost:8083', // Example Catalog Microservice
+      targetServiceUrl: process.env.CATALOG_SERVICE_URL || 'http://localhost:8083',
       requiresAuth: false,
       rateLimitType: 'relaxed',
     },

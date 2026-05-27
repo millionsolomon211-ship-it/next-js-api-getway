@@ -16,17 +16,17 @@ const gateway = new GatewayUseCase(routeRegistry, authAdapter, rateLimiter, http
 async function handleRequest(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url);
   const path = url.pathname;
-  
+
   const headers: Record<string, string> = {};
   request.headers.forEach((value, key) => {
     headers[key] = value;
   });
-  
+
   const clientIp = request.headers.get('x-forwarded-for') || '127.0.0.1';
-  
+
   let body;
   if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
-    // Forward the readable stream directly to avoid buffering overhead
+    // Forward the readable stream directly to avoid bufferinfADvg overhead
     body = request.body;
   }
 
@@ -39,7 +39,7 @@ async function handleRequest(request: NextRequest): Promise<NextResponse> {
   };
 
   const response = await gateway.handleRequest(apiRequest);
-  
+
   // Support returning Next.js errors or streamed responses from API directly
   if (response.status >= 400 && response.status < 500 && !response.body) {
     return NextResponse.json(response.body, { status: response.status });
