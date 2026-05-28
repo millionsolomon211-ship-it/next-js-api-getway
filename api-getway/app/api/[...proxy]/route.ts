@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import '@/src/gateway/infrastructure/TerminalLogger'; // Hook terminal dynamically
 import { GatewayUseCase } from '@/src/gateway/application/GatewayUseCase';
 import { StaticRouteRegistry } from '@/src/gateway/infrastructure/StaticRouteRegistry';
 import { JwtAuthAdapter } from '@/src/gateway/infrastructure/JwtAuthAdapter';

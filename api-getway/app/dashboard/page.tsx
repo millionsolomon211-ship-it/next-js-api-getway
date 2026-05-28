@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { LogEntry } from '@/src/gateway/domain/types';
+import { TerminalLog } from '@/src/gateway/infrastructure/TerminalLogger';
 
 export default function Dashboard() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [termLogs, setTermLogs] = useState<TerminalLog[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchLogs = async () => {
@@ -13,6 +15,11 @@ export default function Dashboard() {
       const data = await res.json();
       if (data.success) {
         setLogs(data.logs);
+      }
+      const trmRes = await fetch('/api/terminal-logs');
+      const trmData = await trmRes.json();
+      if (trmData.success) {
+        setTermLogs(trmData.logs);
       }
     } catch (e) {
       console.error(e);
@@ -45,9 +52,18 @@ export default function Dashboard() {
     }
   };
 
+  const getTermTypeColor = (type: string) => {
+    switch (type) {
+      case 'error': return 'text-red-500 bg-red-500/10 border-red-500/20';
+      case 'warn': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
+      case 'info': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
+      default: return 'text-gray-300 bg-gray-500/10 border-gray-500/20';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white p-8 font-sans selection:bg-purple-500/30">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-12">
         {/* Header Section */}
         <header className="flex items-center justify-between border-b border-white/10 pb-6">
           <div className="space-y-1">
@@ -165,6 +181,56 @@ export default function Dashboard() {
             </table>
           </div>
         </div>
+
+        {/* Terminal Logs Table Section */}
+        <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm">
+          <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/40">
+            <div className="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <h2 className="text-lg font-medium">Terminal Logs</h2>
+            </div>
+            <span className="text-xs text-gray-500 font-mono">Real-time STDOUT capture</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-[#111] text-gray-400">
+                <tr>
+                  <th className="px-6 py-4 font-medium first:pl-8">Type</th>
+                  <th className="px-6 py-4 font-medium min-w-[300px]">Message</th>
+                  <th className="px-6 py-4 font-medium">Time</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {termLogs.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="px-6 py-12 text-center text-gray-500">
+                      No terminal output recorded yet.
+                    </td>
+                  </tr>
+                ) : (
+                  termLogs.map((log) => (
+                    <tr key={log.id} className="hover:bg-white/[0.02] transition-colors group">
+                      <td className="px-6 py-4 first:pl-8 align-top">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${getTermTypeColor(log.type)}`}>
+                          {log.type.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 font-mono text-gray-300 group-hover:text-white transition-colors whitespace-pre-wrap max-w-4xl break-all line-clamp-3">
+                        {log.message}
+                      </td>
+                      <td className="px-6 py-4 text-gray-500 text-xs align-top">
+                        {new Date(log.timestamp).toLocaleTimeString()}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </div>
   );
