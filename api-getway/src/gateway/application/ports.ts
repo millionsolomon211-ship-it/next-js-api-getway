@@ -1,4 +1,4 @@
-import { ApiRequest, ApiResponse, RouteConfig } from '../domain/types';
+import { ApiRequest, ApiResponse, RouteConfig, LogEntry } from '../domain/types';
 
 export interface AuthPort {
   authenticate(request: ApiRequest): Promise<boolean>;
@@ -14,4 +14,9 @@ export interface RouteRegistryPort {
 
 export interface HttpClientPort {
   forward(request: ApiRequest, route: RouteConfig): Promise<ApiResponse>;
+}
+
+export interface LoggerPort {
+  log(entry: LogEntry): void;
+  getRecentLogs(limit?: number): Promise<LogEntry[]>;
 }

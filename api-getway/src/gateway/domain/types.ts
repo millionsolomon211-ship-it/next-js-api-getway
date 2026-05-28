@@ -20,3 +20,14 @@ export interface ApiResponse {
   headers: Record<string, string>;
   body?: any; // Can be a stream, text, or json for true proxying
 }
+
+export interface LogEntry {
+  id: string;
+  timestamp: string;
+  method: HttpMethod;
+  path: string;
+  clientIp: string;
+  status: number;
+  durationMs: number;
+  error?: string;
+}

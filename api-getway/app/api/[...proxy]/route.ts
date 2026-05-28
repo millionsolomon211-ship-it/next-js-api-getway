@@ -4,14 +4,16 @@ import { StaticRouteRegistry } from '@/src/gateway/infrastructure/StaticRouteReg
 import { JwtAuthAdapter } from '@/src/gateway/infrastructure/JwtAuthAdapter';
 import { InMemoryRateLimiter } from '@/src/gateway/infrastructure/InMemoryRateLimiter';
 import { FetchHttpClient } from '@/src/gateway/infrastructure/FetchHttpClient';
+import { FileLoggerAdapter } from '@/src/gateway/infrastructure/FileLoggerAdapter';
 import { ApiRequest, HttpMethod } from '@/src/gateway/domain/types';
 
 const routeRegistry = new StaticRouteRegistry();
 const authAdapter = new JwtAuthAdapter();
 const rateLimiter = new InMemoryRateLimiter();
 const httpClient = new FetchHttpClient();
+export const loggerAdapter = new FileLoggerAdapter();
 
-const gateway = new GatewayUseCase(routeRegistry, authAdapter, rateLimiter, httpClient);
+const gateway = new GatewayUseCase(routeRegistry, authAdapter, rateLimiter, httpClient, loggerAdapter);
 
 async function handleRequest(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url);
