@@ -19,7 +19,9 @@ function writeLog(type: string, args: any[]) {
     // Avoid circular JSON errors when stringifying complex objects
     const message = args.map(a => {
       try {
-        return typeof a === 'object' ? JSON.stringify(a) : String(a);
+        const text = typeof a === 'object' ? JSON.stringify(a) : String(a);
+        // Clean out terminal ANSI color codes before saving to JSON UI
+        return text.replace(/\u001b\[\d+m/g, '').replace(/\u001b\[\d+;\d+m/g, '');
       } catch {
         return '[Object]';
       }
@@ -47,30 +49,27 @@ function writeLog(type: string, args: any[]) {
   }
 }
 
-// NextJS heavily utilizes multiple processes; we ensure we only hook once globally in whichever thread imports this
+// NextJS heavily utilizes custom loggers that bypass console.log, so we hook process.stdout directly
 if (!(global as any).__terminalHooked) {
   (global as any).__terminalHooked = true;
   
-  const originalLog = console.log;
-  const originalError = console.error;
-  const originalWarn = console.warn;
-  const originalInfo = console.info;
+  const originalStdoutWrite = process.stdout.write.bind(process.stdout);
+  const originalStderrWrite = process.stderr.write.bind(process.stderr);
 
-  console.log = (...args) => {
-    writeLog('log', args);
-    originalLog.apply(console, args);
+  // Hook STDOUT
+  process.stdout.write = (chunk: any, encoding?: any, cb?: any) => {
+    if (typeof chunk === 'string' || Buffer.isBuffer(chunk)) {
+      writeLog('info', [chunk.toString().trim()]);
+    }
+    return originalStdoutWrite(chunk, encoding as BufferEncoding, cb);
   };
-  console.error = (...args) => {
-    writeLog('error', args);
-    originalError.apply(console, args);
-  };
-  console.warn = (...args) => {
-    writeLog('warn', args);
-    originalWarn.apply(console, args);
-  };
-  console.info = (...args) => {
-    writeLog('info', args);
-    originalInfo.apply(console, args);
+
+  // Hook STDERR
+  process.stderr.write = (chunk: any, encoding?: any, cb?: any) => {
+    if (typeof chunk === 'string' || Buffer.isBuffer(chunk)) {
+      writeLog('error', [chunk.toString().trim()]);
+    }
+    return originalStderrWrite(chunk, encoding as BufferEncoding, cb);
   };
 }
 
