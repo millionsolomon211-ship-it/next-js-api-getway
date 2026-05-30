@@ -8,7 +8,7 @@ export class GatewayUseCase {
     private rateLimiter: RateLimiterPort,
     private httpClient: HttpClientPort,
     private logger: LoggerPort
-  ) {}
+  ) { }
 
   async handleRequest(request: ApiRequest): Promise<ApiResponse> {
     const startTime = Date.now();
@@ -18,7 +18,7 @@ export class GatewayUseCase {
 
     try {
       const route = await this.routeRegistry.resolveRoute(request.path);
-      
+
       if (!route) {
         status = 404;
         errorMsg = 'Route not found';
@@ -45,7 +45,7 @@ export class GatewayUseCase {
       status = forwardResponse.status;
       responseBody = forwardResponse;
       return forwardResponse;
-      
+
     } catch (err: any) {
       status = 502;
       errorMsg = err.message || 'Bad Gateway';
