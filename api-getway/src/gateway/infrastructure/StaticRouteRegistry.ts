@@ -27,6 +27,12 @@ export class StaticRouteRegistry implements RouteRegistryPort {
       requiresAuth: true,
       rateLimitType: 'strict',
     },
+    {
+      pathPrefix: '/api/usp',
+      targetServiceUrl: process.env.USP_SERVICE_URL || 'https://usp.com.et',
+      requiresAuth: true,
+      rateLimitType: 'strict',
+    },
   ];
 
   async resolveRoute(path: string): Promise<RouteConfig | null> {
@@ -34,3 +40,4 @@ export class StaticRouteRegistry implements RouteRegistryPort {
     return match || null;
   }
 }
+usp.work.gd
