@@ -28,8 +28,8 @@ export class StaticRouteRegistry implements RouteRegistryPort {
       rateLimitType: 'strict',
     },
     {
-      pathPrefix: '/api/usp',
-      targetServiceUrl: process.env.USP_SERVICE_URL || 'https://usp.com.et',
+      pathPrefix: '/api/uspwork',
+      targetServiceUrl: process.env.USPWORK_SERVICE_URL || 'https://usp.work.gd',
       requiresAuth: true,
       rateLimitType: 'strict',
     },
@@ -40,4 +40,3 @@ export class StaticRouteRegistry implements RouteRegistryPort {
     return match || null;
   }
 }
-usp.work.gd
