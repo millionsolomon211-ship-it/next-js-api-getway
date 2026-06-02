@@ -18,7 +18,7 @@ const gateway = new GatewayUseCase(routeRegistry, authAdapter, rateLimiter, http
 
 async function handleRequest(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url);
-  const path = url.pathname;
+  const path = url.pathname + url.search;
 
   const headers: Record<string, string> = {};
   request.headers.forEach((value, key) => {

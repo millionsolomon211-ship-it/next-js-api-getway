@@ -16,8 +16,8 @@ export class StaticRouteRegistry implements RouteRegistryPort {
       rateLimitType: 'standard',
     },
     {
-      pathPrefix: '/api/catalog',
-      targetServiceUrl: process.env.CATALOG_SERVICE_URL || 'http://localhost:8083',
+      pathPrefix: '/api/regions',
+      targetServiceUrl: process.env.content_SERVICE_URL || 'https://service-lime-gamma.vercel.app',
       requiresAuth: false,
       rateLimitType: 'relaxed',
     },
