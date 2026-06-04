@@ -32,6 +32,7 @@ export class StaticRouteRegistry implements RouteRegistryPort {
       targetServiceUrl: process.env.USPWORK_SERVICE_URL || 'https://usp.work.gd',
       requiresAuth: true,
       rateLimitType: 'strict',
+      timeoutMs: 5000,
     },
   ];
 
