@@ -5,6 +5,7 @@ export interface RouteConfig {
   targetServiceUrl: string;
   requiresAuth: boolean;
   rateLimitType: 'strict' | 'standard' | 'relaxed';
+  timeoutMs?: number;
 }
 
 export interface ApiRequest {
