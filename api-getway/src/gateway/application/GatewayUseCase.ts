@@ -47,7 +47,7 @@ export class GatewayUseCase {
       return forwardResponse;
 
     } catch (err: any) {
-      status = 502;
+      status = err.message.includes('timeout') ? 504 : 502;
       errorMsg = err.message || 'Bad Gateway';
       return { status, headers: {}, body: { error: errorMsg } };
     } finally {

@@ -24,17 +24,33 @@ export class FetchHttpClient implements HttpClientPort {
       fetchOptions.duplex = 'half';
     }
 
-    const response = await fetch(targetUrl, fetchOptions);
+    const timeout = route.timeoutMs || 30000; // Default to 30s
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
 
-    const responseHeaders: Record<string, string> = {};
-    response.headers.forEach((value, key) => {
-      responseHeaders[key] = value;
-    });
+    try {
+      const response = await fetch(targetUrl, {
+        ...fetchOptions,
+        signal: controller.signal
+      });
+      clearTimeout(id);
+      
+      const responseHeaders: Record<string, string> = {};
+      response.headers.forEach((value, key) => {
+        responseHeaders[key] = value;
+      });
 
-    return {
-      status: response.status,
-      headers: responseHeaders,
-      body: response.body, // Pass as readable stream directly
-    };
+      return {
+        status: response.status,
+        headers: responseHeaders,
+        body: response.body, // Pass as readable stream directly
+      };
+    } catch (err: any) {
+      clearTimeout(id);
+      if (err.name === 'AbortError') {
+        throw new Error(`Request timeout after ${timeout}ms`);
+      }
+      throw err;
+    }
   }
 }
