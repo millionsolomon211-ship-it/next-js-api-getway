@@ -73,6 +73,12 @@ export default function Dashboard() {
             <p className="text-sm text-gray-400">Real-time metrics and routing logs mapping</p>
           </div>
           <div className="flex items-center gap-4">
+            <a 
+              href="/map"
+              className="px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg text-sm transition-all shadow-lg active:scale-95 font-medium"
+            >
+              View Map
+            </a>
             <div className="flex items-center gap-2">
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
